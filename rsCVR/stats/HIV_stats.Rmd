@@ -1,0 +1,98 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+library(data.table)
+library(readxl)
+library(ggpubr)
+library(xtable)
+
+wd = "/Volumes/HIV/HIV_Tobacco/FunImg"
+
+results_list = list.files(path = wd, pattern = 'rR_rCVR_T1segmented_ROIs.txt', recursive=TRUE)
+names_list = read.table(file = paste(wd, "dir.txt", sep=""), header=FALSE, sep='\n')
+col_name_vec <- setNames(as.character(names_list$V1),as.character(names_list$V1))
+group_list = read_excel("/Volumes/LincolnHardDrive/Lincoln/School/JHU/research/HIV_rsCVR/HIV_Tobacco/Sublist_HIV_Tobac.xlsx")
+
+results_df = lapply(results_list, function(x) {read.table(file = paste(wd, x, sep=""), header = TRUE, sep = '\t', skip=1, nrows=20)})
+combined_results_df <- reduce(results_df, left_join, by=c("Index", "Mask_name"))
+
+row_name_vec <- setNames(as.character(combined_results_df$Mask_name),as.character(combined_results_df$Mask_name))
+
+new_dfs <- map(set_names(c("R", "N")),~select(combined_results_df,starts_with(.x)))
+relative_CBF_df <- new_dfs$R
+num_of_voxels_df <- new_dfs$N
+names(relative_CBF_df) <- col_name_vec
+names(num_of_voxels_df) <- col_name_vec
+setattr(relative_CBF_df, "row.names", row_name_vec)
+setattr(num_of_voxels_df, "row.names", row_name_vec)
+
+relative_CBF_df <- as_tibble(t(relative_CBF_df))
+relative_CBF_df <- add_column(relative_CBF_df, Group = group_list$GroupName)
+
+num_of_voxels_df <- as_tibble(t(num_of_voxels_df))
+num_of_voxels_df <- add_column(num_of_voxels_df, Group = group_list$GroupName)
+
+whole_roi_names <- c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum")
+matlab_results_df <- read.csv('Results.csv', header=FALSE)
+names(matlab_results_df) <- whole_roi_names
+matlab_results_df <- add_column(matlab_results_df, Group = group_list$GroupName)
+reject_results_df <- slice(matlab_results_df, -c(6,41))
+setattr(matlab_results_df, "row.names", col_name_vec)
+# setattr(reject_results_df, "row.names", col_name_vec)
+
+
+group_by(matlab_results_df, Group) %>%
+  summarise(
+    count = n(),
+    mean = mean(Frontal, na.rm = TRUE),
+    sd = sd(Frontal, na.rm = TRUE)
+  )
+ggboxplot(reject_results_df, x = "Group", y = "Limbic")
+
+res.aov <- aov(Limbic ~ Group, data = reject_results_df)
+
+summary(res.aov)
+
+tuk_res <- TukeyHSD(res.aov)
+
+as.data.frame(tuk_res$Group)
+```
+
+```{r}
+matlab_results_df_new <- matlab_results_df %>%
+  mutate(Smoker = if_else(grepl("Smoker", matlab_results_df$Group, fixed = TRUE), 'smoker', 'non-smoker')) %>%
+  mutate(Disease = if_else(grepl("HIV", matlab_results_df$Group, fixed = TRUE), 'HIV', 'SN'))
+
+matlab_results_df_new_reduced <- slice(matlab_results_df_new, -c(6,41))
+
+```
+
+```{r}
+
+anova_results <- purrr::map(matlab_results_df_new[,1:11], ~aov(.x ~ Disease * Smoker, data = matlab_results_df_new))
+
+# c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum")
+
+summary(anova_results[[11]])
+ggboxplot(matlab_results_df_new, x = "Disease", y = "Temporal", color = "Smoker", ylim=c(0,2))
+```
+
+```{r}
+anova_results_red <- purrr::map(matlab_results_df_new_reduced[,1:11], ~aov(.x ~ Disease * Smoker, data = matlab_results_df_new_reduced))
+
+# c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum")
+
+summary(anova_results_red[[10]])
+TukeyHSD(anova_results_red[[8]])
+ggboxplot(matlab_results_df_new_reduced, x = "Disease", y = "Midbrain", color = "Smoker", ylim=c(0,2))
+```
+
