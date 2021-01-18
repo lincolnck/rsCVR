@@ -1,0 +1,129 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+Loading required libraries and packages.
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(tidyverse)
+library(data.table)
+library(readxl)
+library(ggpubr)
+library(xtable)
+
+wd = "/Volumes/ABCD/abcd_data/"
+```
+
+Setting up roi rsCVR dataframe.
+
+```{r}
+results <- read.csv(paste0(wd, 'Results_minor.csv'), header=FALSE)
+subject_names <- read.csv(paste0(wd, 'subject_list.csv'), header=FALSE)
+txt_subject_names <- gsub('^(.{4})(.*)$', '\\1_\\2', subject_names[,])
+# whole_roi_names <- c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum")
+whole_roi_names <- c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum", "SFG", "SFG_PFC", "SFG_pole", "MFG", "MFG_DPFC", "IFG_opercularis", "IFG_orbitalis", "IFG_triangularis", "LFOG", "MFOG", "RG", "PoCG", "PrCG", "SPG", "SMG", "AG", "PrCu", "STG", "STG_pole", "MTG", "MTG_pole", "ITG", "PHG", "ENT", "FuG", "SOG", "MOG", "IOG", "Cu", "LG", "rostral_ACC", "subcallosal_ACC", "subgenual_ACC", "dorsal_ACC", "PCC", "Insula_minor", "Amygdala", "Hippocampus", "Caudate", "Putamen", "GP", "Thalamus_minor", "Hypothalamus", "AnteriorBasalForebrain", "NucleusAccumbens", "RedNucleus", "SubstantiaNigra", "CerebellumGM", "CP", "Midbrain_minor", "CST", "SCP", "MCP", "PCT", "ICP", "ML", "Pons_minor", "Medulla_minor", "ACR", "SCR", "PCR", "GCC", "BCC", "SCC", "PVWl", "ALIC", "PLIC", "RLIC", "EC", "CGC", "CGH", "FxST", "Fx", "IFO", "PTR", "SS", "SFO", "SLF", "Cl", "PosteriorBasalForebrain", "Mammillary", "OpticTract", "PVWa", "PVWp", "SFWM", "SFWMPFC", "SFWMpole", "MFWM", "MFWM_DPFC", "IFWM_opercularis", "IFWM_orbitalis", "IFWM_triangularis", "LFOWM", "MFOWM", "FGWM", "PoCWM", "PrCWM", "SPWM", "SMWM", "AGWM", "PrCuWM", "STWM", "STWM_pole", "MTWM", "MTWM_pole", "ITWM", "FuWM", "SOWM", "MOWM", "IOWM", "CuWM", "LGWM", "rostralWM_ACC", "subcallosalWM_ACC", "subgenualWM_ACC", "dorsalWM_ACC", "PCCWM", "CerebellumWM", "MCP_cb", "ICP_cb", "FrontSul", "CentralSul", "SylFrontSul", "SylTempSul", "SylParieSul", "ParietSul", "CinguSul", "OcciptSul", "TempSul", "Chroid_LVetc", "ECC", "ECSAnterior", "ECSPosterior")
+names(results) <- whole_roi_names
+row.names(results) <- t(txt_subject_names)
+```
+
+Setting up demographic and other information dataframes.
+
+```{r}
+neurocognitive_hdr <- scan('abcd_tbss01.txt', nlines=1, what=character())
+neurocognitive <- read.table('abcd_tbss01.txt', skip=2, header=FALSE)
+names(neurocognitive) <- neurocognitive_hdr
+
+parent_druguse_hdr <- scan('abcd_ksad01.txt', nlines=1, what=character())
+parent_druguse <- read.table('abcd_ksad01.txt', skip=2, header=FALSE)
+names(parent_druguse) <- parent_druguse_hdr
+
+# abcd_ysuip or abcd_ysu or abcd_ymypisu
+kid_druguse_hdr <- scan('abcd_ysu02.txt', nlines=1, what=character())
+kid_druguse <- read.table('abcd_ysu02.txt', skip=2, header=FALSE)
+names(kid_druguse) <- kid_druguse_hdr
+
+toxicology_hdr <- scan('abcd_ytt01.txt', nlines=1, what=character())
+toxicology <- read.table('abcd_ytt01.txt', skip=2, header=FALSE)
+names(toxicology) <- toxicology_hdr
+
+hairsample_hdr <- scan('abcd_yhr01.txt', nlines=1, what=character())
+hairsample <- read.table('abcd_yhr01.txt', skip=2, header=FALSE)
+names(hairsample) <- hairsample_hdr
+
+summarysubs_hdr <- scan('abcd_suss01.txt', nlines=1, what=character())
+summarysubs <- read.table('abcd_suss01.txt', skip=2, header=FALSE)
+names(summarysubs) <- summarysubs_hdr
+```
+
+Extracting corresponding subject information.
+
+```{r}
+subset_neurocognitive <- neurocognitive[which(neurocognitive$subjectkey%in%txt_subject_names), ]
+subset_parent_druguse <- parent_druguse[which(parent_druguse$subjectkey%in%txt_subject_names & parent_druguse$eventname=="baseline_year_1_arm_1"), ]
+subset_kid_druguse <- kid_druguse[which(kid_druguse$subjectkey%in%txt_subject_names), ]
+subset_toxicology <- toxicology[which(toxicology$subjectkey%in%txt_subject_names & toxicology$eventname=="baseline_year_1_arm_1"), ]
+subset_hairsample <- hairsample[which(hairsample$subjectkey%in%txt_subject_names & hairsample$eventname=="baseline_year_1_arm_1"), ]
+subset_summarysubs <- summarysubs[which(summarysubs$subjectkey%in%txt_subject_names & summarysubs$eventname=="baseline_year_1_arm_1"), ]
+```
+
+Set up final combined df including all Variables of Interest.
+
+```{r}
+subset_neurocognitive_df <- subset_neurocognitive[c("interview_age", "sex", "nihtbx_totalcomp_fc", "nihtbx_fluidcomp_agecorrected", "nihtbx_totalcomp_agecorrected", "nihtbx_cryst_agecorrected")]
+
+row.names(subset_neurocognitive_df) <- subset_neurocognitive$subjectkey
+
+subset_kid_druguse_df <- subset_kid_druguse[, c(489)]
+
+final_df <- merge(results, subset_neurocognitive_df,by="row.names")
+final_df_reduced <- slice(final_df, -c(20, 44, 45, 56))
+```
+
+Summary statistics.
+
+```{r}
+summary(final_df_reduced$sex)
+
+summary(final_df_reduced$interview_age)
+
+summary(final_df_reduced$nihtbx_totalcomp_fc)
+```
+ANOVA results.
+
+```{r}
+group_by(final_df_reduced, sex) %>%
+  summarise(
+    count = n(),
+    mean = mean(Frontal, na.rm = TRUE),
+    sd = sd(Frontal, na.rm = TRUE)
+  )
+
+anova_results <- purrr::map(final_df_reduced[,2:12], ~aov(.x ~ sex, data = final_df_reduced))
+
+summary(anova_results[[10]])
+TukeyHSD(anova_results[[8]])
+ggboxplot(final_df_reduced, x = "sex", y = "Midbrain", ylim=c(0,2))
+```
+
+GLM Results.
+
+```{r}
+# whole_roi_names <- c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus")
+plot(final_df_reduced$Limbic, final_df_reduced$nihtbx_totalcomp_fc)
+```
+```{r}
+# 143 is all minor ROIs, 12 is major ROIs
+lm_results <- purrr::map(final_df_reduced[,2:143], ~lm(nihtbx_cryst_agecorrected ~ .x, na.action=na.omit, data = final_df_reduced))
+
+lm_results_coeffs <- sapply(lm_results,function(x)coef(summary(x)))
+lm_results_coeffs
+# plot(final_df_reduced$Midbrain, final_df_reduced$nihtbx_totalcomp_fc)
+# abline(lm_results[[10]])
+```
