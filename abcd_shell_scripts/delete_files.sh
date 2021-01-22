@@ -1,8 +1,7 @@
 #!/bin/bash
 
-for d in */; do
+for d in $1/; do
 	cd "$d"
-	echo $d
-	find . ! \( -name 'bold*' -o -name 'RS_rCVRmap*' \) -exec rm -f {} +
+	find . ! \( -name 'bold*' -o -name 'RS_rCVRmap*' -o -name 'dicom' \) -exec rm -f {} +
 	cd ..
 done
