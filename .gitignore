@@ -5,7 +5,7 @@
 ._*
 .Spotlight-V100
 .Trashes
-.dmg
+*.dmg
 */.DS_Store
 
 # Test data folder #
