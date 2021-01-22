@@ -5,5 +5,9 @@
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
+.dmg
+*/.DS_Store
+
+# Test data folder #
+####################
+test_data/
