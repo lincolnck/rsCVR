@@ -254,10 +254,11 @@ for sub=1:nsub
         index=[(roi-1)*2+1,roi*2];
         vox=voxnum(index);
         cvr=cvrval(index);
-        roicvr(sub,roi)=sum(double(vox).*cvr)/sum(double(vox));            
+        roicvr(sub,roi)=sum(double(vox).*cvr)/sum(double(vox));
+        roivox(sub,roi)=sum(double(vox));
     end
 end
-% [wbcvr' roicvr]
-    
-writematrix(roicvr,[cwd filesep 'Results_minor_all_subs.csv']);
+check = [roicvr roivox];
+
+writematrix(check,[cwd filesep 'results_all_subs_vol_cvr.csv']);
 writecell(subjectlist,[cwd filesep 'subject_list_all_subs.csv']);

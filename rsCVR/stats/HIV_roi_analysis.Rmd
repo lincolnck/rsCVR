@@ -34,10 +34,11 @@ wd = '/Volumes/HIV/HIV/HIV_newsubjects/'
 Setting up ROI rsCVR dataframe.
  
 ```{r, echo=FALSE}
-results <- read.csv(paste0(wd, 'FunImg/Results_minor_all_subs.csv'), header=FALSE)
+results <- read.csv(paste0(wd, 'FunImg/results_all_subs_vol_cvr.csv'), header=FALSE)
 subject_names <- read.csv(paste0(wd, 'FunImg/subject_list_all_subs.csv'), header=FALSE)
-whole_roi_names <- c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum", "SFG", "SFG_PFC", "SFG_pole", "MFG", "MFG_DPFC", "IFG_opercularis", "IFG_orbitalis", "IFG_triangularis", "LFOG", "MFOG", "RG", "PoCG", "PrCG", "SPG", "SMG", "AG", "PrCu", "STG", "STG_pole", "MTG", "MTG_pole", "ITG", "PHG", "ENT", "FuG", "SOG", "MOG", "IOG", "Cu", "LG", "rostral_ACC", "subcallosal_ACC", "subgenual_ACC", "dorsal_ACC", "PCC", "Insula_minor", "Amygdala", "Hippocampus", "Caudate", "Putamen", "GP", "Thalamus_minor", "Hypothalamus", "AnteriorBasalForebrain", "NucleusAccumbens", "RedNucleus", "SubstantiaNigra", "CerebellumGM", "CP", "Midbrain_minor", "CST", "SCP", "MCP", "PCT", "ICP", "ML", "Pons_minor", "Medulla_minor", "ACR", "SCR", "PCR", "GCC", "BCC", "SCC", "PVWl", "ALIC", "PLIC", "RLIC", "EC", "CGC", "CGH", "FxST", "Fx", "IFO", "PTR", "SS", "SFO", "SLF", "Cl", "PosteriorBasalForebrain", "Mammillary", "OpticTract", "PVWa", "PVWp", "SFWM", "SFWMPFC", "SFWMpole", "MFWM", "MFWM_DPFC", "IFWM_opercularis", "IFWM_orbitalis", "IFWM_triangularis", "LFOWM", "MFOWM", "FGWM", "PoCWM", "PrCWM", "SPWM", "SMWM", "AGWM", "PrCuWM", "STWM", "STWM_pole", "MTWM", "MTWM_pole", "ITWM", "FuWM", "SOWM", "MOWM", "IOWM", "CuWM", "LGWM", "rostralWM_ACC", "subcallosalWM_ACC", "subgenualWM_ACC", "dorsalWM_ACC", "PCCWM", "CerebellumWM", "MCP_cb", "ICP_cb", "FrontSul", "CentralSul", "SylFrontSul", "SylTempSul", "SylParieSul", "ParietSul", "CinguSul", "OcciptSul", "TempSul", "Chroid_LVetc", "ECC", "ECSAnterior", "ECSPosterior")
-major_roi_names <- c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum")
+cvr_roi_names <- c("Frontal", "Parietal", "Temporal", "Limbic", "Occipital", "Insula", "BasalGanglia", "Thalamus", "BasalForebrain", "Midbrain", "Cerebellum", "SFG", "SFG_PFC", "SFG_pole", "MFG", "MFG_DPFC", "IFG_opercularis", "IFG_orbitalis", "IFG_triangularis", "LFOG", "MFOG", "RG", "PoCG", "PrCG", "SPG", "SMG", "AG", "PrCu", "STG", "STG_pole", "MTG", "MTG_pole", "ITG", "PHG", "ENT", "FuG", "SOG", "MOG", "IOG", "Cu", "LG", "rostral_ACC", "subcallosal_ACC", "subgenual_ACC", "dorsal_ACC", "PCC", "Insula_minor", "Amygdala", "Hippocampus", "Caudate", "Putamen", "GP", "Thalamus_minor", "Hypothalamus", "AnteriorBasalForebrain", "NucleusAccumbens", "RedNucleus", "SubstantiaNigra", "CerebellumGM", "CP", "Midbrain_minor", "CST", "SCP", "MCP", "PCT", "ICP", "ML", "Pons_minor", "Medulla_minor", "ACR", "SCR", "PCR", "GCC", "BCC", "SCC", "PVWl", "ALIC", "PLIC", "RLIC", "EC", "CGC", "CGH", "FxST", "Fx", "IFO", "PTR", "SS", "SFO", "SLF", "Cl", "PosteriorBasalForebrain", "Mammillary", "OpticTract", "PVWa", "PVWp", "SFWM", "SFWMPFC", "SFWMpole", "MFWM", "MFWM_DPFC", "IFWM_opercularis", "IFWM_orbitalis", "IFWM_triangularis", "LFOWM", "MFOWM", "FGWM", "PoCWM", "PrCWM", "SPWM", "SMWM", "AGWM", "PrCuWM", "STWM", "STWM_pole", "MTWM", "MTWM_pole", "ITWM", "FuWM", "SOWM", "MOWM", "IOWM", "CuWM", "LGWM", "rostralWM_ACC", "subcallosalWM_ACC", "subgenualWM_ACC", "dorsalWM_ACC", "PCCWM", "CerebellumWM", "MCP_cb", "ICP_cb", "FrontSul", "CentralSul", "SylFrontSul", "SylTempSul", "SylParieSul", "ParietSul", "CinguSul", "OcciptSul", "TempSul", "Chroid_LVetc", "ECC", "ECSAnterior", "ECSPosterior")
+vol_roi_names <- paste(cvr_roi_names, "vol", sep="_")
+whole_roi_names <- c(cvr_roi_names, vol_roi_names)
 names(results) <- whole_roi_names
 row.names(results) <- t(subject_names)
 ```
@@ -92,10 +93,9 @@ with(final_df_new, table(group, sex))
 ```
 Setting up sub-dataframes
 ```{r}
-
 thalamus_outliers <- final_df_new %>%
   group_by(Disease, Smoker) %>%
-  identify_outliers(trans_Thalamus)
+  identify_outliers(Thalamus)
  
 final_df_thalamus <- final_df_new[which(!(final_df_new$Row.names%in%thalamus_outliers$Row.names)), ]
 
@@ -113,8 +113,51 @@ final_df_healthy_no <- final_df_thalamus[final_df_thalamus$Disease == "SN",]
 ```
 ANOVA TYPE I
 ```{r}
-anova_results_untransformed_typeI <- purrr::map(final_df_new[,2:12], ~aov(.x ~ Disease * Smoker, data=final_df_new))
-lapply(anova_results_untransformed_typeI,function(x)summary(x))
+anova_cvr_results <- purrr::map(final_df_new[,2:12], ~aov(.x ~ Disease * Smoker, data=final_df_new))
+anova_vol_results <- purrr::map(final_df_new[,146:156], ~aov(.x ~ Disease * Smoker, data=final_df_new))
+lapply(anova_cvr_results,function(x)summary(x))
+lapply(anova_vol_results,function(x)summary(x))
+```
+Substructure ANOVA TYPE I
+```{r}
+anova_type1 <- purrr::map(final_df_new[,2:145], ~aov(.x ~ Disease * Smoker, data=final_df_new))
+lapply(anova_type1,function(x)summary(x))
+
+sstable <- summary(anova_type1$Hippocampus)
+sstable
+sstable$pes <- c(sstable$'Sum Sq'[-nrow(sstable)], NA)/(sstable$'Sum Sq' + sstable$'Sum Sq'[nrow(sstable)])
+
+sstable
+kable(sstable, digits=3)
+```
+ANOVA W Contrasts and Effect size
+```{r}
+model <- purrr::map(final_df_new[,2:145], ~lm(.x ~ Disease * Smoker, data = final_df_new))
+anova_cvr_results <- purrr::map(final_df_new[,2:12], ~Anova(lm(.x ~ Disease * Smoker, data = final_df_new)))
+anova_vol_results <- purrr::map(final_df_new[,146:156], ~Anova(lm(.x ~ Disease * Smoker, data = final_df_new)))
+
+
+sstable <- anova_cvr_results$BasalForebrain
+sstable <- anova_vol_results$BasalForebrain_vol
+
+sstable$pes <- c(sstable$'Sum Sq'[-nrow(sstable)], NA)/(sstable$'Sum Sq' + sstable$'Sum Sq'[nrow(sstable)])
+
+kable(sstable, digits=3)
+```
+```{r}
+cvr_vol_lm <- lm(BasalForebrain~BasalForebrain_vol, data=final_df_new)
+
+tidy(cvr_vol_lm) %>%
+  select("term", "estimate", "p.value")
+
+fit_line <- function(x){coef(cvr_vol_lm)[2]*x+coef(cvr_vol_lm)[1]}
+
+ggplot(data=final_df_new)+
+  geom_point(aes(x=BasalForebrain_vol, y=BasalForebrain)) +
+  stat_function(fun=fit_line) + 
+  xlab("Volume") +
+  ylab("rs-CVR") +
+  theme_classic()
 ```
 ANOVA TYPE II
 ```{r}
@@ -124,7 +167,10 @@ lapply(anova_results_typeII,function(x)x)
 TUKEY'S HSD
 ```{r}
 summary(aov(Thalamus ~ group, data=final_df_new))
-TukeyHSD(aov(Thalamus ~ group, data=final_df_new))
+posthoc <- TukeyHSD(aov(Caudate ~ Disease * Smoker, data=final_df_new))
+posthoc <- TukeyHSD(aov(BasalForebrain_vol ~ group, data=final_df_new))
+tidy(posthoc) %>%
+  select("contrast", "estimate", "adj.p.value")
 ```
 Displaying ANOVA and HSD Results
 ```{r}
