@@ -31,7 +31,7 @@ opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
 wd = '/Volumes/HIV/HIV/HIV_newsubjects/'
 ```
  
-Setting up roi rsCVR dataframe.
+Setting up ROI rsCVR dataframe.
  
 ```{r, echo=FALSE}
 results <- read.csv(paste0(wd, 'FunImg/Results_minor_all_subs.csv'), header=FALSE)
@@ -51,7 +51,7 @@ subset_group_list <- group_list[which(group_list$folder%in%as.character(subject_
 row.names(subset_group_list) <- subset_group_list$folder
 ```
  
-Set up final combined df including all Variables of Interest.
+Set up final combined dataframe including all Variables of Interest.
  
 ```{r}
 final_df <- merge(results, subset_group_list,by="row.names")
@@ -90,85 +90,8 @@ final_df_new %>%
 
 with(final_df_new, table(group, sex))
 ```
-Outliers
+Setting up sub-dataframes
 ```{r}
-final_df_new %>%
-  group_by(Disease, Smoker) %>%
-  identify_outliers(Cerebellum)
-```
-```{r}
-# Build the linear model
-model  <- lapply(final_df_new[,2:12],function(x)lm(x ~ Disease*Smoker,
-             data = final_df_new))
-# Create a QQ plot of residuals
-# lapply(model,function(x)ggqqplot(residuals(x)))
- 
-lapply(model,function(x)shapiro_test(residuals(x)))
-shapiro_tests
-
-model  <- lapply(final_df_new[,2:12],function(x)lm(x ~ group,
-             data = final_df_new))
-# Create a QQ plot of residuals
-# lapply(model,function(x)ggqqplot(residuals(x)))
- 
-lapply(model,function(x)shapiro_test(residuals(x)))
-shapiro_tests
-```
-HOMOGENEITY OF VARIANCE: Assessed for each major ROI using Levene's Test. A non-significant p-value (>0.05) indicates that variance is homogeneous across groups. 
-```{r}
-variance_check <- sapply(final_df_new[,2:12],function(x)levene_test(final_df_new, x ~ Disease*Smoker))
-variance_check
-```
-The results above indicate that the only ROI that fails the Levene test is the Limbic ROI, and a variance stabilizing transformation might be required in the case of any models created with the Limbic ROI as a response.
-
-Seven out of eleven of the major ROI's have rsCVR value distributions which differ significantly from the normal distribution.
-```{r}
-tukey_transformed_data <- sapply(final_df_new[,2:12],function(x)transformTukey(x, plotit=FALSE))
- 
-colnames(tukey_transformed_data) <- paste0("tukey_trans_", colnames(tukey_transformed_data))
- 
-box_cox_lambdas <- sapply(final_df_new[,2:12],function(x)BoxCox.lambda(x))
-box_cox_lambdas_unamed <- unname(box_cox_lambdas)
-index <- c(1,2,3,4,5,6,7,8,9,10,11)
-for (x in index) {
-  boxcox_transformed_data <- BoxCox(final_df_new[,(index+1)],box_cox_lambdas_unamed[index])
-}
- 
-colnames(boxcox_transformed_data) <- paste0("boxcox_trans_", colnames(boxcox_transformed_data))
- 
-best_transformed_data <- lapply(final_df_new[,2:12],function(x)orderNorm(x))
- 
-best_trans_data <- cbind(best_transformed_data$Frontal$x.t, best_transformed_data$Parietal$x.t, best_transformed_data$Temporal$x.t, best_transformed_data$Limbic$x.t, best_transformed_data$Occipital$x.t, best_transformed_data$Insula$x.t, best_transformed_data$BasalGanglia$x.t, best_transformed_data$Thalamus$x.t, best_transformed_data$BasalForebrain$x.t, best_transformed_data$Midbrain$x.t, best_transformed_data$Cerebellum$x.t)
-colnames(best_trans_data) <- paste0("best_trans_", colnames(final_df_new[,2:12]))
- 
-final_df_trans <- cbind(final_df_new, data.frame(tukey_transformed_data), data.frame(boxcox_transformed_data), data.frame(best_trans_data))
- 
-# Build the linear model
-model_tukey  <- lapply(final_df_trans[,(ncol(final_df_trans)-32):(ncol(final_df_trans)-22)],function(x)lm(x ~ Disease*Smoker, data = final_df_trans))
-# Create a QQ plot of residuals
-# lapply(model_tukey,function(x)ggqqplot(residuals(x)))
- 
-shapiro_tests_tukey <- lapply(model_tukey,function(x)shapiro_test(residuals(x)))
-shapiro_tests_tukey
- 
-model_boxcox  <- lapply(final_df_trans[,(ncol(final_df_trans)-21):(ncol(final_df_trans)-11)],function(x)lm(x ~ Disease*Smoker, data = final_df_trans))
-# Create a QQ plot of residuals
-# lapply(model_boxcox,function(x)ggqqplot(residuals(x)))
- 
-shapiro_tests_boxcox <- lapply(model_boxcox,function(x)shapiro_test(residuals(x)))
-
-model_best  <- lapply(final_df_trans[,(ncol(final_df_trans)-10):(ncol(final_df_trans))],function(x)lm(x ~ Disease*Smoker, data = final_df_trans))
-# Create a QQ plot of residuals
-# lapply(model_best,function(x)ggqqplot(residuals(x)))
- 
-shapiro_tests_best <- lapply(model_best,function(x)shapiro_test(residuals(x)))
-```
-```{r}
-tukey_transformed_data <- data.frame(tukey_transformed_data)
-optimal_trans <- cbind(best_transformed_data$Frontal$x.t, tukey_transformed_data$tukey_trans_Parietal, tukey_transformed_data$tukey_trans_Temporal, tukey_transformed_data$tukey_trans_Limbic, best_transformed_data$Occipital$x.t, best_transformed_data$Insula$x.t, best_transformed_data$BasalGanglia$x.t, tukey_transformed_data$tukey_trans_Thalamus, tukey_transformed_data$tukey_trans_BasalForebrain, best_transformed_data$Midbrain$x.t, tukey_transformed_data$tukey_trans_Cerebellum)
-colnames(optimal_trans) <- paste0("trans_", colnames(final_df_new[,2:12]))
- 
-final_df_new <- cbind(final_df_new, optimal_trans)
 
 thalamus_outliers <- final_df_new %>%
   group_by(Disease, Smoker) %>%
@@ -188,40 +111,23 @@ final_df_nonsmokers_no <- final_df_thalamus[final_df_thalamus$Smoker == "non-smo
 final_df_HIV_no <- final_df_thalamus[final_df_thalamus$Disease == "HIV",]
 final_df_healthy_no <- final_df_thalamus[final_df_thalamus$Disease == "SN",]
 ```
- 
+ANOVA TYPE I
 ```{r}
-homoscedasticity_check <- sapply(final_df_new[,(ncol(final_df_new)-10):(ncol(final_df_new))],function(x)bartlett.test(x~final_df_new$group))
-homoscedasticity_check
- 
-homoscedasticity_check_untrans <- sapply(final_df_new[,2:12],function(x)bartlett.test(x~final_df_new$group))
-homoscedasticity_check_untrans
- 
-# variance_check <- sapply(final_df_new[,2:12],function(x)levene_test(final_df_new, x ~ Disease*Smoker))
-# variance_check
-```
- 
-```{r}
- 
 anova_results_untransformed_typeI <- purrr::map(final_df_new[,2:12], ~aov(.x ~ Disease * Smoker, data=final_df_new))
 lapply(anova_results_untransformed_typeI,function(x)summary(x))
- 
-anova_results_typeI <- purrr::map(final_df_new[,(ncol(final_df_new)-10):(ncol(final_df_new))], ~aov(.x ~ Disease * Smoker, data=final_df_new))
-lapply(anova_results_typeI,function(x)summary(x))
 ```
-TYPE II
+ANOVA TYPE II
 ```{r}
-# anova_results_typeII <- purrr::map(final_df_new[,(ncol(final_df_new)-10):(ncol(final_df_new))], ~Anova(lm(.x ~ Disease * Smoker, data = final_df_new), type="II"))
 anova_results_typeII <- purrr::map(final_df_new[,2:12], ~Anova(lm(.x ~ Disease * Smoker, data = final_df_new), type="II"))
 lapply(anova_results_typeII,function(x)x)
-final_df_new %>%
-  group_by(Smoker) %>%
-  get_summary_stats(Frontal, type="mean_sd")
 ```
- 
+TUKEY'S HSD
 ```{r}
 summary(aov(Thalamus ~ group, data=final_df_new))
 TukeyHSD(aov(Thalamus ~ group, data=final_df_new))
-
+```
+Displaying ANOVA and HSD Results
+```{r}
 stat.test <- tibble::tribble(
   ~group1, ~group2, ~p.adj,
   "SN_S", "HIV", 0.0206,
@@ -241,16 +147,8 @@ ggboxplot(final_df_new, x = "group", y = "Thalamus", fill="gray", order=c("SN","
     label = "p = {p.adj}"
   )
   theme_classic()
- 
- 
 ```
- 
-TYPE III
-```{r}
-anova_results_typeIII <- purrr::map(final_df_new[,(ncol(final_df_new)-10):(ncol(final_df_new))], ~Anova(lm(.x ~ Disease * Smoker, data = final_df_new), type="III"))
-lapply(anova_results_typeIII,function(x)x)
-```
-
+KRUSKAL + WILCOX (Nonparametric ANOVA and Tukey's HSD)
 ```{r}
 kruskal_results <- purrr::map(final_df_new[,2:12], ~kruskal.test(.x ~ group, data = final_df_new))
 lapply(kruskal_results,function(x)x)
@@ -266,75 +164,6 @@ SNsmoker_vs_HIVsmoker = wilcox.test(final_df_new[final_df_new$Disease == "SN" & 
 HIVnonsmoker_vs_HIVsmoker = wilcox.test(final_df_new[final_df_new$Disease == "HIV" & final_df_new$Smoker == "non-smoker",]$Thalamus, final_df_new[final_df_new$Disease == "HIV" & final_df_new$Smoker == "smoker",]$Thalamus)$p.value
 p.adjust(c(SNnonsmoker_vs_HIVnonsmoker, HIVnonsmoker_vs_HIVsmoker, SNsmoker_vs_HIVnonsmoker, SNnonsmoker_vs_HIVsmoker, SNnonsmoker_vs_SNsmoker, SNsmoker_vs_HIVsmoker), method="holm")
 ```
-Tukey Results
-```{r}
-#FRONTAL (Smoker)
-frontal_outliers <- final_df_new %>%
-  group_by(Disease, Smoker) %>%
-  identify_outliers(trans_Frontal)
- 
-final_df_frontal <- final_df_new[which(!(final_df_new$Row.names%in%frontal_outliers$Row.names)), ]
- 
-anova_results_frontal <- aov(trans_Frontal ~ Disease * Smoker, data=final_df_frontal)
-summary(anova_results_frontal)
- 
-TukeyHSD(anova_results_frontal)
-```
- 
-```{r}
-#LIMBIC (Disease and Smoker)
-limbic_outliers <- final_df_new %>%
-  group_by(Disease, Smoker) %>%
-  identify_outliers(trans_Limbic)
- 
-final_df_limbic <- final_df_new[which(!(final_df_new$Row.names%in%limbic_outliers$Row.names)), ]
- 
-anova_results_limbic <- aov(trans_Limbic ~ Disease * Smoker, data=final_df_limbic)
-summary(anova_results_limbic)
- 
-TukeyHSD(anova_results_limbic)
-```
-```{r}
-basalforebrain_outliers <- final_df_new %>%
-  group_by(Disease, Smoker) %>%
-  identify_outliers(trans_BasalForebrain)
- 
-final_df_basalforebrain <- final_df_new[which(!(final_df_new$Row.names%in%basalforebrain_outliers$Row.names)), ]
- 
-anova_results_basalforebrain <- aov(trans_BasalForebrain ~ Disease * Smoker, data=final_df_basalforebrain)
-summary(anova_results_basalforebrain)
- 
-TukeyHSD(anova_results_basalforebrain)
-```
-```{r}
-basalganglia_outliers <- final_df_new %>%
-  group_by(Disease, Smoker) %>%
-  identify_outliers(trans_BasalGanglia)
- 
-final_df_basalganglia <- final_df_new[which(!(final_df_new$Row.names%in%basalganglia_outliers$Row.names)), ]
- 
-anova_results_basalganglia <- aov(trans_BasalGanglia ~ Disease * Smoker, data=final_df_basalganglia)
-summary(anova_results_basalganglia)
- 
-TukeyHSD(anova_results_basalganglia)
-```
-```{r}
-thalamus_outliers <- final_df_new %>%
-  group_by(Disease, Smoker) %>%
-  identify_outliers(trans_Thalamus)
- 
-final_df_thalamus <- final_df_new[which(!(final_df_new$Row.names%in%thalamus_outliers$Row.names)), ]
- 
-anova_results_thalamus <- aov(Thalamus ~ Disease * Smoker, data=final_df_new)
-summary(anova_results_thalamus)
- 
-TukeyHSD(anova_results_thalamus)
-```
-```{r}
-#BASALFOREBRAIN (Disease)
-TukeyHSD(anova_results$BasalForebrain)
-plot(final_df_new$HIV_negative, final_df_new$Thalamus)
-```
 Regression Analysis
 ```{r}
 # All subjects: final_df_new
@@ -349,16 +178,14 @@ Regression Analysis
 
 # + Age_cent:Nic_duration_cent + Age_cent:ViralLoad_cent + Nic_duration_cent:ViralLoad_cent + Smoker_negative:HIV_negative + Age_cent:nadir_cd4_cent
 
-model <- lm(Frontal ~ Age_cent + Nic_duration_cent * nadir_cd4_cent + Smoker_negative * HIV_negative + Age_cent:Nic_duration_cent + Age_cent:nadir_cd4_cent, data = final_df_new)
+model <- lm(Thalamus ~ Age_cent * nadir_cd4_cent + Age_cent * Nic_duration_cent, data = final_df_new)
 
 summary(model)
 
 tidy(model) %>%
   select(term, estimate, p.value)
-
 ```
-
-
+Plot
 ```{r}
 HIV_neg <- lm(BasalForebrain ~ Age_cent + Nic_duration_cent + Smoker_negative + Age, data = final_df_healthy)
 
@@ -387,6 +214,7 @@ tidy(HIV_neg) %>%
 tidy(HIV_pos) %>%
   select(term, estimate, p.value)
 ```
+Plot
 ```{r}
 HIV_pos <- lm(Thalamus ~ Age_cent * nadir_cd4_cent, data = final_df_HIV)
 summary(HIV_pos)
@@ -406,6 +234,7 @@ ggplot(data=final_df_HIV)+
 tidy(HIV_pos) %>%
   select(term, estimate, p.value)
 ```
+Plot
 ```{r}
 smoke_pos <- lm(BasalForebrain ~ Age_cent * Nic_duration_cent, data = final_df_smokers)
 summary(smoke_pos)
