@@ -1,4 +1,4 @@
-% Convert BOLD image
+% Convert BOLD image from .nii to analyze
 
 cwd = '/Volumes/LINCOLNHD/Lincoln/School/JHU/research/HIV_rsCVR/HIV_newsubjects/FunImg'; %Project path
 %     t1dir='D:\work\HIV_Tobacco\T1Img\040002_F04';

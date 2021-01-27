@@ -1,4 +1,4 @@
-% Convert T1 image
+% Convert T1 image from .nii to analyze
 
 cwd = '/Volumes/LincolnHardDrive/Lincoln/School/JHU/research/HIV_rsCVR/HIV_Tobacco/T1img'; %Project path
 %     t1dir='D:\work\HIV_Tobacco\T1Img\040002_F04';

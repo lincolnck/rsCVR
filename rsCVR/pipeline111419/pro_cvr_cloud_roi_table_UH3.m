@@ -1,4 +1,4 @@
-% collecting CVR values from txt files
+% collecting CVR/Volume values from txt files
 cwd = '/Volumes/HIV/HIV/HIV_newsubjects/FunImg';
 subjectlist={
     '040002_F04'
