@@ -44,7 +44,7 @@ function success = CVR_pipeline_jobman(path_code, jsonInput)
         
         % run CVR_pipeline
         tic
-        output_content = CVR_pipeline(path_code, jsonInput);
+        output_content = CVR_pipeline_v2(path_code, jsonInput);
         toc
         
         % zip the folder for download

@@ -23,11 +23,12 @@ for sub=1:nsub
     matsize=double(hdr.Dimensions(1:3));
     matresol=double(hdr.PixelDimensions);
     filename=[cwd filesep subjectlist{sub} filesep 'bold' filesep 'bold_3_0.img'];
+%     avg_c02_filename=[cwd filesep subjectlist{sub} filesep 'c02_cvr' filesep ];
     count =  count+1;
     if ~isfile(filename)                                                                                                                                                                                                                                                 
         disp("file doesn't exist")
         continue;
     end
-    rsCVR_singlesub_analysis(filename,tr, cutfreq, matsize, matresol, SmoothFWHMmm,templatedir)
+    rsCVR_singlesub_analysis(filename, avg_c02_filename, tr, cutfreq, matsize, matresol, SmoothFWHMmm,templatedir)
     cd '/Volumes/LINCOLN/liu/rsCVR/pipeline111419'
 end

@@ -1,0 +1,19 @@
+{
+  "userInput": {
+    "boldHdrFileName": "../test_data/testy/liz//c02_cvr.hdr",
+    "boldImgFileName": "../test_data/testy/liz//c02_cvr.img",
+    "multiatlasFileName": "../test_data/testy/liz//Result.zip",
+    "TR": 0.72
+  },
+  "private": {
+    "SmoothFWHMmm": 8,
+    "cutfreq": 0.1164,
+    "brainMaskName": "BrainMask"
+  },
+  "Dir": {
+    "mainPath": "/Volumes/LINCOLN/liu/abcd_shell_scripts",
+    "outputFileName": "output",
+    "workDirFileName": "workspace",
+    "outPath": "/Volumes/LINCOLN/liu/abcd_shell_scripts/out"
+  }
+}

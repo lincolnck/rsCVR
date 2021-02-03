@@ -1,0 +1,28 @@
+{
+	"userInput" : {
+		"boldHdrFileName" : "3T0493_16_1-d0211.hdr",
+		"boldImgFileName" : "3T0493_16_1-d0211.img",
+		"co2TraceFileName" : "3T0493_co2080608_chopped.TXT",
+		"multiatlasFileName" : "3T0493_mprSeg.zip",
+		"TR": 2,
+		"sample_rate_co2" : 48,
+		"sliceOrderFile" : ""
+	},
+	
+	"private" : {
+		"envelope_interp_rate" : 1,
+		"SmoothFWHMmm" : 8,
+		"select" : 0.1,
+		"brainMaskName" : "BrainMask",
+		"fixedDelayRangeMin" : -5,
+		"fixedDelayRangeMax" : 30
+	},
+	
+	"Dir" : {
+		"mainPath" : "/home/zbaker/Zach/zachCvrProgram/dataRuns/191219_parkWave1_processWithCVRMRICloudv3/staging/3T0493",
+		"outputFileName" : "output",
+		"workDirFileName" : "workspace",
+		"outPath" : "/home/zbaker/Zach/zachCvrProgram/dataRuns/191219_parkWave1_processWithCVRMRICloudv3/staging/3T0493/out"
+	}
+	
+}

@@ -22,8 +22,8 @@
 % written by Lincoln Kartchner (lincoln@jhu.edu)
 % 2021-01-27
 
-% sourceDir = '/Volumes/My Passport/fMRI3/image03';
-% targetDir = '/Volumes/ABCD/dec_abcd';
+% sourceDir = '/Volumes/LINCOLN/liu/test_data/pipeline_test/ABCD';
+% targetDir = '/Volumes/LINCOLN/liu/test_data/pipeline_test/ABCD/ouput';
 % dcm2nii = '/usr/local/bin/dcm2nii';
 
 function f = tgz_dcm2analyze(sourceDir, targetDir, dcm2nii)
@@ -33,7 +33,8 @@ if ~exist(sourceDir, 'dir') || isempty(sourceDir)
     error('The specified source directory: %s does not exist or is empty.', sourceDir);
 end
 if ~exist(targetDir, 'dir')
-    error('The specified target directory: %s does not exist.', targetDir);
+    cmd = sprintf('%s %s', 'mkdir', targetDir);
+    system(cmd, '-echo');
 end
 if ~exist(dcm2nii,'file') 
     error('Unable to find: %s',dcm2nii); 
