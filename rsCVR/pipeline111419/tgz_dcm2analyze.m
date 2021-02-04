@@ -1,4 +1,4 @@
-% This function convert DICOM images saved in compressed .tgz 
+% This function converts DICOM images saved in compressed .tgz 
 % archives into NIfTI/ANALYZE images
 %
 % Input:

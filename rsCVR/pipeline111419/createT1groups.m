@@ -1,3 +1,28 @@
+% This function gathers images of a specified type ("T1", "T1-NORM", etc.)
+% into directories of a specified size (=10 subjects, etc.). It can also
+% compress those resulting directories to provide the input for the batch
+% T1 segmentation processing on MRICloud.
+%
+% Input:
+%    targetDir: The full filepath of the directory containing the subject
+%    specific directories (i.e. the directories named for each subject
+%    containing all the images for that respective subject).
+%    groupSize: The size of the resulting group to be uploaded to MRICloud.
+%    The batch T1 segmentation on MRICloud accepts up to 10 subjects in one
+%    batch.
+%    imageType: The type of image to be gathered. "T1", "T1-NORM", etc. The
+%    script looks for the imageType string within the filename.
+%    zipFiles: "Y" or "N"
+%    groupsDir: The name of the directory where the group subdirectories
+%    will be created, if it doesn't exist, it will be created. 
+%
+% Output:
+%    The images will be sorted into groups of a specified size and zipped
+%    if wanted.
+%    
+% written by Lincoln Kartchner (lincoln@jhu.edu)
+% 2021-02-03
+
 function f = createT1groups(targetDir,groupSize,imageType,zipFiles,groupsDir)
 
 d_number=1;

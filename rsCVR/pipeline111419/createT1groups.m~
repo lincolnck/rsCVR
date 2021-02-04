@@ -1,11 +1,36 @@
-function f = createT1groups(targetDir,groupSize,imageType,zipFiles,groupsDir)
+% This function gathers images of a specified type ("T1", "T1-NORM", etc.)
+% into directories of a specified size (=10 subjects, etc.). It can also
+% compress those resulting directories to provide the input for the batch
+% T1 segmentation processing on MRICloud.
+%
+% Input:
+%    targetDir: The full filepath of the directory containing the subject
+%    specific directories (i.e. the directories named for each subject
+%    containing all the images for that respective subject).
+%    groupSize: The size of the resulting group to be uploaded to MRICloud.
+%    The batch T1 segmentation on MRICloud accepts up to 10 subjects in one
+%    batch.
+%    imageType: The type of image to be gathered. "T1", "T1-NORM", etc. The
+%    script looks for the imageType string within the filename.
+%    zipFiles: "Y" or "N"
+%    groupsDir: The name of the directory where the group subdirectories
+%    will be created, if it doesn't exist, it will be created. 
+%
+%       More information on 'dcm2nii', including how to download and
+%       install it can be found on the website url below. Note: this
+%       function uses the obsolete version of 'dcm2nii', which allows
+%       conversion to ANALYZE format, rather than the newe 'dcm2niix'.
+%
+%               https://people.cas.sc.edu/rorden/mricron/dcm2nii.html
+%
+% Output:
+%    The DICOM images are saved in the target directory as NIfTI/ANALYZE
+%    images.
+%    
+% written by Lincoln Kartchner (lincoln@jhu.edu)
+% 2021-01-27
 
-% (targetDir,groupSize,imageType,zipFiles,groupsDir, os)
-% if os=='mac'
-%     commands = {'mv -v', 'rm -r', 'mkdir -p'};
-% else
-%     commands = {'MOVE', 'RMDIR /q/s', 'MD'};
-% end
+function f = createT1groups(targetDir,groupSize,imageType,zipFiles,groupsDir)
 
 d_number=1;
 new_subdir_name=join(["group" d_number],"_");
@@ -38,7 +63,9 @@ for ii = 1:numel(nTargetDir)
             end
         else
             if zipFiles == "Y"
-                dir2zip = 
+                cd(fullfile(join([".." filesep groupsDir filesep new_subdir_name],"")))
+                zip(new_subdir_name,{'*.img','*.hdr'})
+                cd(fullfile(targetDir))
             end
             d_number=d_number+1;
             new_subdir_name=join(["group" d_number],"_");

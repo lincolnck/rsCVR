@@ -1,3 +1,18 @@
+% This function groups all images belonging to one subject into one
+% subject-specific directory
+%
+% Input:
+%    targetDir: The full filepath of the directory containing converted
+%    NIfTI/ANALYZE images.
+%    os: "mac" or "windows", specifies commands used by either bash or cmd
+%    respectively.
+%
+% Output:
+%    The images are grouped into subject specific directories. 
+%    
+% written by Lincoln Kartchner (lincoln@jhu.edu)
+% 2021-02-03
+
 function f = groupSubjects(targetDir, os)
 
 if os=='mac'
